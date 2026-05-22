@@ -1,0 +1,34 @@
+package ar.edu.ungs.billetera.modelo.actividad;
+
+import ar.edu.ungs.billetera.modelo.cuenta.Cuenta;
+import java.time.LocalDate;
+
+public class Transferencia extends Actividad {
+
+    private double monto;
+    private Cuenta cuentaDestino;
+
+    public Transferencia(LocalDate fecha, Cuenta cuentaOrigen, Cuenta cuentaDestino, double monto) {
+        super(fecha, cuentaOrigen);
+        this.monto = monto;
+        this.cuentaDestino = cuentaDestino;
+    }
+
+    public void ejecutar() {
+        if (!getCuentaOrigen().puedeOperar(monto)) {
+            throw new IllegalStateException("La cuenta origen no puede operar con ese monto.");
+        }
+        getCuentaOrigen().debitar(monto);
+        cuentaDestino.acreditar(monto);
+    }
+
+    public double getMonto() { return monto; }
+    public Cuenta getCuentaDestino() { return cuentaDestino; }
+
+    @Override
+    public String toString() {
+        return "Transferencia | " + super.toString() +
+                " | Destino: " + cuentaDestino.getCvu() +
+                " | Monto: $" + monto;
+    }
+}
