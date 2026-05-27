@@ -7,12 +7,11 @@ import ar.edu.ungs.billetera.modelo.actividad.Transferencia;
 import ar.edu.ungs.billetera.modelo.actividad.inversion.Inversion;
 import ar.edu.ungs.billetera.modelo.actividad.inversion.Precancelable;
 import ar.edu.ungs.billetera.modelo.cuenta.Cuenta;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+
 
 import ar.edu.ungs.billetera.modelo.cuenta.CuentaPremium;
 import ar.edu.ungs.billetera.modelo.cuenta.CuentaRegular;
@@ -206,7 +205,7 @@ public class Billetera implements IBilletera {
         }
         List<String> resultado = new ArrayList<>();
         for (Cuenta cuenta : usuarios.get(dniUsuario).getCuentas()) {
-            resultado.add(cuenta.getClass().getSimpleName() + ": " + cuenta.getAlias() + " (" + cuenta.getCvu() + ")");
+            resultado.add(cuenta.getTipo() + ": " + cuenta.getAlias() + " (" + cuenta.getCvu() + ")");
         }
         return resultado;
     }
@@ -244,7 +243,7 @@ public class Billetera implements IBilletera {
         }
         Cuenta origen = cuentas.get(cvuOrigen);
         Cuenta destino = cuentas.get(cvuDestino);
-        Transferencia transferencia = new Transferencia(LocalDate.now(), origen, destino, monto);
+        Transferencia transferencia = new Transferencia(Utilitarios.hoy(), origen, destino, monto);
         transferencia.ejecutar();
         historialGlobal.add(transferencia);
     }
@@ -312,7 +311,7 @@ public class Billetera implements IBilletera {
             throw new IllegalStateException("La cuenta no puede operar con ese monto.");
         }
         Usuario usuario = usuarios.get(dni);
-        VinculadaDivisa inversion = new VinculadaDivisa(LocalDate.now(), cuenta, LocalDate.now(), plazoDias, monto, divisa, tasa);
+        VinculadaDivisa inversion = new VinculadaDivisa(Utilitarios.hoy(), cuenta, Utilitarios.hoy(), plazoDias, monto, divisa, tasa);
         cuenta.debitar(monto);
         usuario.registrarInversion(monto);
         historialGlobal.add(inversion);
@@ -347,13 +346,12 @@ public class Billetera implements IBilletera {
             throw new IllegalArgumentException("La cuenta no puede operar con ese monto.");
         }
         Usuario usuario = usuarios.get(dni);
-        FondoLiquidez inversion = new FondoLiquidez(LocalDate.now(), cuenta, LocalDate.now(), plazoDias, monto);
+        FondoLiquidez inversion = new FondoLiquidez(Utilitarios.hoy(), cuenta, Utilitarios.hoy(), plazoDias, monto);
         cuenta.debitar(monto);
         usuario.registrarInversion(monto);
         historialGlobal.add(inversion);
         return inversion.getId().hashCode();
     }
-
 
     private Inversion buscarInversion(String cvu, int idInversion) {
         for (Actividad actividad : historialGlobal) {
@@ -400,7 +398,6 @@ public class Billetera implements IBilletera {
         return aliases.get(alias);
     }
 
-
     // El problema es que desde Transferencia no podemos saber
     // el DNI del usuario --> solo sabemos la cuenta.
     // Necesitamos un metodo auxiliar privado que dado un CVU encuentre el DNI
@@ -423,25 +420,25 @@ public class Billetera implements IBilletera {
     public List<String> consultarHistorialGlobal() {
         List<String> resultado = new ArrayList<>();
         for (Actividad actividad : historialGlobal) {
+            StringBuilder sb = new StringBuilder();
             if (actividad instanceof Transferencia transferencia) {
                 String dniOrigen = buscarDniPorCvu(transferencia.getCuentaOrigen().getCvu());
                 String dniDestino = buscarDniPorCvu(transferencia.getCuentaDestino().getCvu());
-                resultado.add(
-                        "origen: " + dniOrigen + " (" + transferencia.getCuentaOrigen().getCvu() + ")\n" +
-                                "destino: " + dniDestino + " (" + transferencia.getCuentaDestino().getCvu() + ")\n" +
-                                "monto: " + transferencia.getMonto() + "\n" +
-                                "Aprobado"
-                );
+                sb.append("fecha: ").append(actividad.getFecha()).append("\n")
+                        .append("origen: ").append(dniOrigen).append(" (").append(transferencia.getCuentaOrigen().getCvu()).append(")\n")
+                        .append("destino: ").append(dniDestino).append(" (").append(transferencia.getCuentaDestino().getCvu()).append(")\n")
+                        .append("monto: ").append(transferencia.getMonto()).append("\n")
+                        .append("Aprobado");
             } else if (actividad instanceof Inversion inversion) {
                 String dniOrigen = buscarDniPorCvu(inversion.getCuentaOrigen().getCvu());
-                resultado.add(
-                        "origen: " + dniOrigen + " (" + inversion.getCuentaOrigen().getCvu() + ")\n" +
-                                "desc: " + inversion.getClass().getSimpleName() + "\n" +
-                                "monto: " + inversion.getMonto() + "\n" +
-                                "plazo: " + inversion.getPlazo() + "\n" +
-                                "Aprobado"
-                );
+                sb.append("fecha: ").append(actividad.getFecha()).append("\n")
+                        .append("origen: ").append(dniOrigen).append(" (").append(inversion.getCuentaOrigen().getCvu()).append(")\n")
+                        .append("desc: ").append(inversion.getClass().getSimpleName()).append("\n")
+                        .append("monto: ").append(inversion.getMonto()).append("\n")
+                        .append("plazo: ").append(inversion.getPlazo()).append("\n")
+                        .append("Aprobado");
             }
+            if (!sb.isEmpty()) resultado.add(sb.toString());
         }
         return resultado;
     }
@@ -456,30 +453,30 @@ public class Billetera implements IBilletera {
         }
         List<String> resultado = new ArrayList<>();
         for (Actividad actividad : historialGlobal) {
+            StringBuilder sb = new StringBuilder();
             if (actividad instanceof Transferencia transferencia) {
                 if (transferencia.getCuentaOrigen().getCvu().equals(cvu) ||
                         transferencia.getCuentaDestino().getCvu().equals(cvu)) {
                     String dniOrigen = buscarDniPorCvu(transferencia.getCuentaOrigen().getCvu());
                     String dniDestino = buscarDniPorCvu(transferencia.getCuentaDestino().getCvu());
-                    resultado.add(
-                            "origen: " + dniOrigen + " (" + transferencia.getCuentaOrigen().getCvu() + ")\n" +
-                                    "destino: " + dniDestino + " (" + transferencia.getCuentaDestino().getCvu() + ")\n" +
-                                    "monto: " + transferencia.getMonto() + "\n" +
-                                    "Aprobado"
-                    );
+                    sb.append("fecha: ").append(actividad.getFecha()).append("\n")
+                            .append("origen: ").append(dniOrigen).append(" (").append(transferencia.getCuentaOrigen().getCvu()).append(")\n")
+                            .append("destino: ").append(dniDestino).append(" (").append(transferencia.getCuentaDestino().getCvu()).append(")\n")
+                            .append("monto: ").append(transferencia.getMonto()).append("\n")
+                            .append("Aprobado");
                 }
             } else if (actividad instanceof Inversion inversion) {
                 if (inversion.getCuentaOrigen().getCvu().equals(cvu)) {
                     String dniOrigen = buscarDniPorCvu(inversion.getCuentaOrigen().getCvu());
-                    resultado.add(
-                            "origen: " + dniOrigen + " (" + inversion.getCuentaOrigen().getCvu() + ")\n" +
-                                    "desc: " + inversion.getClass().getSimpleName() + "\n" +
-                                    "monto: " + inversion.getMonto() + "\n" +
-                                    "plazo: " + inversion.getPlazo() + "\n" +
-                                    "Aprobado"
-                    );
+                    sb.append("fecha: ").append(actividad.getFecha()).append("\n")
+                            .append("origen: ").append(dniOrigen).append(" (").append(inversion.getCuentaOrigen().getCvu()).append(")\n")
+                            .append("desc: ").append(inversion.getClass().getSimpleName()).append("\n")
+                            .append("monto: ").append(inversion.getMonto()).append("\n")
+                            .append("plazo: ").append(inversion.getPlazo()).append("\n")
+                            .append("Aprobado");
                 }
             }
+            if (!sb.isEmpty()) resultado.add(sb.toString());
         }
         return resultado;
     }
@@ -527,7 +524,7 @@ public class Billetera implements IBilletera {
                 .limit(cantidadTop)
                 .forEach(entry -> {
                     Cuenta cuenta = cuentas.get(entry.getKey());
-                    resultado.add(cuenta.getClass().getSimpleName() + ": " + cuenta.getAlias() + " (" + cuenta.getCvu() + ")");
+                    resultado.add(cuenta.getTipo() + ": " + cuenta.getAlias() + " (" + cuenta.getCvu() + ")");
                 });
 
         return resultado;
@@ -557,7 +554,7 @@ public class Billetera implements IBilletera {
 
     // Transferir entre cuentas
     public void transferir(Cuenta origen, Cuenta destino, double monto) {
-        Transferencia t = new Transferencia(LocalDate.now(), origen, destino, monto);
+        Transferencia t = new Transferencia(Utilitarios.hoy(), origen, destino, monto);
         t.ejecutar();
         historialGlobal.add(t);
     }
@@ -592,7 +589,25 @@ public class Billetera implements IBilletera {
 
     @Override
     public String toString() {
-        return "Billetera | Usuarios: " + usuarios.size() +
-                " | Actividades: " + historialGlobal.size();
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== BILLETERA VIRTUAL ===\n");
+        sb.append("Usuarios registrados: ").append(usuarios.size()).append("\n");
+        sb.append("Empresas registradas: ").append(empresas.size()).append("\n");
+        sb.append("Actividades totales: ").append(historialGlobal.size()).append("\n\n");
+
+        sb.append("--- USUARIOS ---\n");
+        for (Usuario usuario : usuarios.values()) {
+            sb.append(usuario).append("\n");
+            for (Cuenta cuenta : usuario.getCuentas()) {
+                sb.append("  └ ").append(cuenta).append("\n");
+            }
+        }
+
+        sb.append("\n--- EMPRESAS ---\n");
+        for (Empresa empresa : empresas.values()) {
+            sb.append(empresa).append("\n");
+        }
+
+        return sb.toString();
     }
 }

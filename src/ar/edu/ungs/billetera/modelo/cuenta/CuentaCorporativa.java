@@ -17,10 +17,14 @@ public class CuentaCorporativa extends Cuenta {
     }
 
     public String getCuit() { return cuit; }
+    public String getTipo() {
+        return "Corporativa";
+    }
     public boolean isUsuarioAutorizado() { return usuarioAutorizado; }
 
     @Override
     public String toString() {
         return "CuentaCorporativa | CUIT: " + cuit + " | " + super.toString();
     }
+
 }

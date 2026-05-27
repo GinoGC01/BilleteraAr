@@ -1,5 +1,6 @@
 package ar.edu.ungs.billetera.modelo.actividad.inversion;
 
+import ar.edu.ungs.billetera.Utilitarios;
 import ar.edu.ungs.billetera.modelo.cuenta.Cuenta;
 import ar.edu.ungs.billetera.modelo.cuenta.CuentaCorporativa;
 import java.time.LocalDate;
@@ -20,7 +21,9 @@ public class FondoLiquidez extends Inversion {
 
     @Override
     public double calcularResultado() {
-        return getMonto() * 0.03 * getPlazo();
+        long diasTranscurridos = Utilitarios.hoy().toEpochDay() - getFechaConstitucion().toEpochDay();
+        double cotizacionFle = Utilitarios.consultarCotizacion("FLE");
+        return getMonto() * (0.08 / 365.0) * diasTranscurridos * cotizacionFle;
     }
 
     @Override

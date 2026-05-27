@@ -13,8 +13,10 @@ public abstract class Cuenta {
         this.saldo = saldo;
     }
 
-    // Método abstracto, cada subclase resuelve
+    // Metodo abstracto, cada subclase resuelve
     public abstract boolean puedeOperar(double monto);
+
+    public abstract String getTipo();
 
     // Getters
     public String getCvu() { return cvu; }

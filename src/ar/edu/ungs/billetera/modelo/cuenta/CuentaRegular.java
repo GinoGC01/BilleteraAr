@@ -16,6 +16,10 @@ public class CuentaRegular extends Cuenta {
         return (getSaldo() + monto) <= SALDO_MAXIMO;
     }
 
+    public String getTipo() {
+        return "Regular";
+    }
+
     @Override
     public String toString() {
         return "CuentaRegular | " + super.toString();
