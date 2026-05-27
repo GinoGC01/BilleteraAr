@@ -16,7 +16,10 @@ public class Transferencia extends Actividad {
 
     public void ejecutar() {
         if (!getCuentaOrigen().puedeOperar(monto)) {
-            throw new IllegalStateException("La cuenta origen no puede operar con ese monto.");
+            throw new IllegalStateException("Saldo insuficiente en cuenta origen.");
+        }
+        if (!getCuentaDestino().puedeOperar(monto)) {
+            throw new IllegalStateException("La cuenta destino superaría el límite permitido.");
         }
         getCuentaOrigen().debitar(monto);
         cuentaDestino.acreditar(monto);
