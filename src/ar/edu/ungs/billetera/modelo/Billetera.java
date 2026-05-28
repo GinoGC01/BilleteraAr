@@ -158,7 +158,7 @@ public class Billetera implements IBilletera {
         String cvu = Utilitarios.generarSiguienteCvu();
         CuentaPremium cuenta = new CuentaPremium(cvu, alias, depositoInicial);
         cuentas.put(cvu, cuenta);
-        aliases.put(cvu, alias);
+        aliases.put(alias, cvu);
         usuarios.get(dniUsuario).agregarCuenta(cuenta);
         return cvu;
     }
@@ -547,45 +547,6 @@ public class Billetera implements IBilletera {
         return volumenPorCuenta;
     }
 
-    // Obtener usuario
-    public Usuario getUsuario(String id) {
-        return usuarios.get(id);
-    }
-
-    // Transferir entre cuentas
-    public void transferir(Cuenta origen, Cuenta destino, double monto) {
-        Transferencia t = new Transferencia(Utilitarios.hoy(), origen, destino, monto);
-        t.ejecutar();
-        historialGlobal.add(t);
-    }
-
-    // Registrar inversión
-    public void invertir(Usuario usuario, Inversion inversion) {
-        if (!inversion.getCuentaOrigen().puedeOperar(inversion.getMonto())) {
-            throw new IllegalStateException("La cuenta no puede operar con ese monto.");
-        }
-        inversion.getCuentaOrigen().debitar(inversion.getMonto());
-        usuario.registrarInversion(inversion.getMonto());
-        historialGlobal.add(inversion);
-    }
-
-    // Precancelar inversión
-    public double precancelar(Inversion inversion) {
-        if (!(inversion instanceof Precancelable)) {
-            throw new IllegalStateException("Esta inversión no es precancelable.");
-        }
-        return ((Precancelable) inversion).calcularResultadoPrecancelado();
-    }
-
-    // Historial global
-    public List<Actividad> getHistorialGlobal() {
-        return historialGlobal;
-    }
-
-    // Total invertido por usuario
-    public double getTotalInvertido(String idUsuario) {
-        return usuarios.get(idUsuario).getTotalInvertido();
-    }
 
     @Override
     public String toString() {

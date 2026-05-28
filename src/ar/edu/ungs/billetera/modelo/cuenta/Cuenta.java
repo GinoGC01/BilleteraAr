@@ -3,9 +3,9 @@ package ar.edu.ungs.billetera.modelo.cuenta;
 public abstract class Cuenta {
 
     // Atributos base, todas las cuentas deben tener:
-    private String cvu;
-    private String alias;
-    private double saldo;
+    protected String cvu;
+    protected String alias;
+    protected double saldo;
 
     public Cuenta(String cvu, String alias, double saldo) {
         this.cvu = cvu;
