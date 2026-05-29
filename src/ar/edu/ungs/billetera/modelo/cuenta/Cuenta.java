@@ -16,12 +16,12 @@ public abstract class Cuenta {
     // Metodo abstracto, cada subclase resuelve
     public abstract boolean puedeOperar(double monto);
 
-    public abstract String getTipo();
+    public abstract String obtenerTipo();
 
     // Getters
-    public String getCvu() { return cvu; }
-    public String getAlias() { return alias; }
-    public double getSaldo() { return saldo; }
+    public String obtenerCvu() { return cvu; }
+    public String obtenerAlias() { return alias; }
+    public double obtenerSaldo() { return saldo; }
 
     // Para modificar el saldo (transferencias e inversiones)
     public void debitar(double monto) {

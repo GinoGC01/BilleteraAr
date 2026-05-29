@@ -16,12 +16,12 @@ public abstract class Actividad {
         this.id = UUID.randomUUID().toString(); //uuid unico
     }
 
-    public String getId() { return id; }
-    public LocalDate getFecha() { return fecha; }
-    public Cuenta getCuentaOrigen() { return cuentaOrigen; }
+    public String obtenerId() { return id; }
+    public LocalDate obtenerFecha() { return fecha; }
+    public Cuenta obtenerCuentaOrigen() { return cuentaOrigen; }
 
     @Override
     public String toString() {
-        return "Fecha: " + fecha + " | Origen: " + cuentaOrigen.getCvu();
+        return "Fecha: " + fecha + " | Origen: " + cuentaOrigen.obtenerCvu();
     }
 }

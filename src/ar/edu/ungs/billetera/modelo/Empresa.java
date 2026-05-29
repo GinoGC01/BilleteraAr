@@ -29,12 +29,12 @@ public class Empresa {
         return personasAutorizadas.contains(dni);
     }
 
-    public String getCuit() { return cuit; }
-    public String getNombreFantasia() { return nombreFantasia; }
-    public String getTelefono() { return telefono; }
-    public String getEmail() { return email; }
-    public String getNombreContacto() { return nombreContacto; }
-    public List<String> getPersonasAutorizadas() { return personasAutorizadas; }
+    public String obtenerCuit() { return cuit; }
+    public String obtenerNombreFantasia() { return nombreFantasia; }
+    public String obtenerTelefono() { return telefono; }
+    public String obtenerEmail() { return email; }
+    public String obtenerNombreContacto() { return nombreContacto; }
+    public List<String> obtenerPersonasAutorizadas() { return personasAutorizadas; }
 
     @Override
     public String toString() {

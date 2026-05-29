@@ -19,9 +19,9 @@ public abstract class Inversion extends Actividad {
 
     public abstract double calcularResultado();
 
-    public LocalDate getFechaConstitucion() { return fechaConstitucion; }
-    public int getPlazo() { return plazo; }
-    public double getMonto() { return monto; }
+    public LocalDate obtenerFechaConstitucion() { return fechaConstitucion; }
+    public int obtenerPlazo() { return plazo; }
+    public double obtenerMonto() { return monto; }
 
     @Override
     public String toString() {

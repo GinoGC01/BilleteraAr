@@ -13,9 +13,9 @@ public class CuentaPremium extends Cuenta {
 
     @Override
     public boolean puedeOperar(double monto) {
-        return (getSaldo() - monto) >= 0;
+        return (obtenerSaldo() - monto) >= 0;
     }
-    public String getTipo() {
+    public String obtenerTipo() {
         return "Premium";
     }
 

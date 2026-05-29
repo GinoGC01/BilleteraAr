@@ -204,8 +204,8 @@ public class Billetera implements IBilletera {
             throw new IllegalArgumentException("El usuario no existe.");
         }
         List<String> resultado = new ArrayList<>();
-        for (Cuenta cuenta : usuarios.get(dniUsuario).getCuentas()) {
-            resultado.add(cuenta.getTipo() + ": " + cuenta.getAlias() + " (" + cuenta.getCvu() + ")");
+        for (Cuenta cuenta : usuarios.get(dniUsuario).obtenerCuentas()) {
+            resultado.add(cuenta.obtenerTipo() + ": " + cuenta.obtenerAlias() + " (" + cuenta.obtenerCvu() + ")");
         }
         return resultado;
     }
@@ -218,7 +218,7 @@ public class Billetera implements IBilletera {
         if (!cuentas.containsKey(cvu)) {
             throw new IllegalArgumentException("La cuenta no existe.");
         }
-        return cuentas.get(cvu).getSaldo();
+        return cuentas.get(cvu).obtenerSaldo();
     }
 
     @Override
@@ -277,7 +277,7 @@ public class Billetera implements IBilletera {
         cuenta.debitar(monto);
         usuario.registrarInversion(monto);
         historialGlobal.add(inversion);
-        return inversion.getId().hashCode(); //hashcode para poder devolver el entero - preguntar profe
+        return inversion.obtenerId().hashCode(); //hashcode para poder devolver el entero - preguntar profe
     }
 
     @Override
@@ -315,7 +315,7 @@ public class Billetera implements IBilletera {
         cuenta.debitar(monto);
         usuario.registrarInversion(monto);
         historialGlobal.add(inversion);
-        return inversion.getId().hashCode(); // lo mismo
+        return inversion.obtenerId().hashCode(); // lo mismo
     }
 
     @Override
@@ -350,14 +350,14 @@ public class Billetera implements IBilletera {
         cuenta.debitar(monto);
         usuario.registrarInversion(monto);
         historialGlobal.add(inversion);
-        return inversion.getId().hashCode();
+        return inversion.obtenerId().hashCode();
     }
 
     private Inversion buscarInversion(String cvu, int idInversion) {
         for (Actividad actividad : historialGlobal) {
             if (actividad instanceof Inversion inversion) {
-                if (inversion.getCuentaOrigen().getCvu().equals(cvu) &&
-                        inversion.getId().hashCode() == idInversion) {
+                if (inversion.obtenerCuentaOrigen().obtenerCvu().equals(cvu) &&
+                        inversion.obtenerId().hashCode() == idInversion) {
                     return inversion;
                 }
             }
@@ -384,7 +384,7 @@ public class Billetera implements IBilletera {
         }
         double resultado = ((Precancelable) inversion).calcularResultadoPrecancelado();
         cuentas.get(cvu).acreditar(resultado);
-        usuarios.get(dni).registrarInversion(-inversion.getMonto());
+        usuarios.get(dni).registrarInversion(-inversion.obtenerMonto());
     }
 
     @Override
@@ -404,8 +404,8 @@ public class Billetera implements IBilletera {
 
     private String buscarDniPorCvu(String cvu) {
         for (Map.Entry<String, Usuario> entry : usuarios.entrySet()) {
-            for (Cuenta cuenta : entry.getValue().getCuentas()) {
-                if (cuenta.getCvu().equals(cvu)) {
+            for (Cuenta cuenta : entry.getValue().obtenerCuentas()) {
+                if (cuenta.obtenerCvu().equals(cvu)) {
                     return entry.getKey();
                 }
             }
@@ -422,20 +422,20 @@ public class Billetera implements IBilletera {
         for (Actividad actividad : historialGlobal) {
             StringBuilder sb = new StringBuilder();
             if (actividad instanceof Transferencia transferencia) {
-                String dniOrigen = buscarDniPorCvu(transferencia.getCuentaOrigen().getCvu());
-                String dniDestino = buscarDniPorCvu(transferencia.getCuentaDestino().getCvu());
-                sb.append("fecha: ").append(actividad.getFecha()).append("\n")
-                        .append("origen: ").append(dniOrigen).append(" (").append(transferencia.getCuentaOrigen().getCvu()).append(")\n")
-                        .append("destino: ").append(dniDestino).append(" (").append(transferencia.getCuentaDestino().getCvu()).append(")\n")
-                        .append("monto: ").append(transferencia.getMonto()).append("\n")
+                String dniOrigen = buscarDniPorCvu(transferencia.obtenerCuentaOrigen().obtenerCvu());
+                String dniDestino = buscarDniPorCvu(transferencia.obtenerCuentaDestino().obtenerCvu());
+                sb.append("fecha: ").append(actividad.obtenerFecha()).append("\n")
+                        .append("origen: ").append(dniOrigen).append(" (").append(transferencia.obtenerCuentaOrigen().obtenerCvu()).append(")\n")
+                        .append("destino: ").append(dniDestino).append(" (").append(transferencia.obtenerCuentaDestino().obtenerCvu()).append(")\n")
+                        .append("monto: ").append(transferencia.obtenerMonto()).append("\n")
                         .append("Aprobado");
             } else if (actividad instanceof Inversion inversion) {
-                String dniOrigen = buscarDniPorCvu(inversion.getCuentaOrigen().getCvu());
-                sb.append("fecha: ").append(actividad.getFecha()).append("\n")
-                        .append("origen: ").append(dniOrigen).append(" (").append(inversion.getCuentaOrigen().getCvu()).append(")\n")
+                String dniOrigen = buscarDniPorCvu(inversion.obtenerCuentaOrigen().obtenerCvu());
+                sb.append("fecha: ").append(actividad.obtenerFecha()).append("\n")
+                        .append("origen: ").append(dniOrigen).append(" (").append(inversion.obtenerCuentaOrigen().obtenerCvu()).append(")\n")
                         .append("desc: ").append(inversion.getClass().getSimpleName()).append("\n")
-                        .append("monto: ").append(inversion.getMonto()).append("\n")
-                        .append("plazo: ").append(inversion.getPlazo()).append("\n")
+                        .append("monto: ").append(inversion.obtenerMonto()).append("\n")
+                        .append("plazo: ").append(inversion.obtenerPlazo()).append("\n")
                         .append("Aprobado");
             }
             if (!sb.isEmpty()) resultado.add(sb.toString());
@@ -455,24 +455,24 @@ public class Billetera implements IBilletera {
         for (Actividad actividad : historialGlobal) {
             StringBuilder sb = new StringBuilder();
             if (actividad instanceof Transferencia transferencia) {
-                if (transferencia.getCuentaOrigen().getCvu().equals(cvu) ||
-                        transferencia.getCuentaDestino().getCvu().equals(cvu)) {
-                    String dniOrigen = buscarDniPorCvu(transferencia.getCuentaOrigen().getCvu());
-                    String dniDestino = buscarDniPorCvu(transferencia.getCuentaDestino().getCvu());
-                    sb.append("fecha: ").append(actividad.getFecha()).append("\n")
-                            .append("origen: ").append(dniOrigen).append(" (").append(transferencia.getCuentaOrigen().getCvu()).append(")\n")
-                            .append("destino: ").append(dniDestino).append(" (").append(transferencia.getCuentaDestino().getCvu()).append(")\n")
-                            .append("monto: ").append(transferencia.getMonto()).append("\n")
+                if (transferencia.obtenerCuentaOrigen().obtenerCvu().equals(cvu) ||
+                        transferencia.obtenerCuentaDestino().obtenerCvu().equals(cvu)) {
+                    String dniOrigen = buscarDniPorCvu(transferencia.obtenerCuentaOrigen().obtenerCvu());
+                    String dniDestino = buscarDniPorCvu(transferencia.obtenerCuentaDestino().obtenerCvu());
+                    sb.append("fecha: ").append(actividad.obtenerFecha()).append("\n")
+                            .append("origen: ").append(dniOrigen).append(" (").append(transferencia.obtenerCuentaOrigen().obtenerCvu()).append(")\n")
+                            .append("destino: ").append(dniDestino).append(" (").append(transferencia.obtenerCuentaDestino().obtenerCvu()).append(")\n")
+                            .append("monto: ").append(transferencia.obtenerMonto()).append("\n")
                             .append("Aprobado");
                 }
             } else if (actividad instanceof Inversion inversion) {
-                if (inversion.getCuentaOrigen().getCvu().equals(cvu)) {
-                    String dniOrigen = buscarDniPorCvu(inversion.getCuentaOrigen().getCvu());
-                    sb.append("fecha: ").append(actividad.getFecha()).append("\n")
-                            .append("origen: ").append(dniOrigen).append(" (").append(inversion.getCuentaOrigen().getCvu()).append(")\n")
+                if (inversion.obtenerCuentaOrigen().obtenerCvu().equals(cvu)) {
+                    String dniOrigen = buscarDniPorCvu(inversion.obtenerCuentaOrigen().obtenerCvu());
+                    sb.append("fecha: ").append(actividad.obtenerFecha()).append("\n")
+                            .append("origen: ").append(dniOrigen).append(" (").append(inversion.obtenerCuentaOrigen().obtenerCvu()).append(")\n")
                             .append("desc: ").append(inversion.getClass().getSimpleName()).append("\n")
-                            .append("monto: ").append(inversion.getMonto()).append("\n")
-                            .append("plazo: ").append(inversion.getPlazo()).append("\n")
+                            .append("monto: ").append(inversion.obtenerMonto()).append("\n")
+                            .append("plazo: ").append(inversion.obtenerPlazo()).append("\n")
                             .append("Aprobado");
                 }
             }
@@ -490,8 +490,8 @@ public class Billetera implements IBilletera {
             throw new IllegalArgumentException("El usuario no existe.");
         }
         List<String> resultado = new ArrayList<>();
-        for (Cuenta cuenta : usuarios.get(dniUsuario).getCuentas()) {
-            resultado.addAll(consultarHistorialCuenta(cuenta.getCvu()));
+        for (Cuenta cuenta : usuarios.get(dniUsuario).obtenerCuentas()) {
+            resultado.addAll(consultarHistorialCuenta(cuenta.obtenerCvu()));
         }
         return resultado;
     }
@@ -504,7 +504,7 @@ public class Billetera implements IBilletera {
         if (!usuarios.containsKey(dniUsuario)) {
             throw new IllegalArgumentException("El usuario no existe.");
         }
-        return usuarios.get(dniUsuario).getTotalInvertido();
+        return usuarios.get(dniUsuario).obtenerTotalInvertido();
     }
 
     @Override
@@ -514,7 +514,7 @@ public class Billetera implements IBilletera {
         }
 
         // Cuento las actividades por CVU - metodo extraido (preguntar profe) IJ
-        Map<String, Integer> volumenPorCuenta = getStringIntegerMap();
+        Map<String, Integer> volumenPorCuenta = obtenerMapaVolumen();
 
         // Ordeno de mayor a menor y tomo los primeros N
         List<String> resultado = new ArrayList<>();
@@ -524,29 +524,28 @@ public class Billetera implements IBilletera {
                 .limit(cantidadTop)
                 .forEach(entry -> {
                     Cuenta cuenta = cuentas.get(entry.getKey());
-                    resultado.add(cuenta.getTipo() + ": " + cuenta.getAlias() + " (" + cuenta.getCvu() + ")");
+                    resultado.add(cuenta.obtenerTipo() + ": " + cuenta.obtenerAlias() + " (" + cuenta.obtenerCvu() + ")");
                 });
 
         return resultado;
     }
 
     // consultar
-    private Map<String, Integer> getStringIntegerMap() {
+    private Map<String, Integer> obtenerMapaVolumen() {
         Map<String, Integer> volumenPorCuenta = new HashMap<>();
         for (Actividad actividad : historialGlobal) {
             if (actividad instanceof Transferencia transf) {
-                String cvuOrigen = transf.getCuentaOrigen().getCvu();
-                String cvuDestino = transf.getCuentaDestino().getCvu();
+                String cvuOrigen = transf.obtenerCuentaOrigen().obtenerCvu();
+                String cvuDestino = transf.obtenerCuentaDestino().obtenerCvu();
                 volumenPorCuenta.put(cvuOrigen, volumenPorCuenta.getOrDefault(cvuOrigen, 0) + 1);
                 volumenPorCuenta.put(cvuDestino, volumenPorCuenta.getOrDefault(cvuDestino, 0) + 1);
             } else if (actividad instanceof Inversion inv) {
-                String cvuOrigen = inv.getCuentaOrigen().getCvu();
+                String cvuOrigen = inv.obtenerCuentaOrigen().obtenerCvu();
                 volumenPorCuenta.put(cvuOrigen, volumenPorCuenta.getOrDefault(cvuOrigen, 0) + 1);
             }
         }
         return volumenPorCuenta;
     }
-
 
     @Override
     public String toString() {
@@ -559,7 +558,7 @@ public class Billetera implements IBilletera {
         sb.append("--- USUARIOS ---\n");
         for (Usuario usuario : usuarios.values()) {
             sb.append(usuario).append("\n");
-            for (Cuenta cuenta : usuario.getCuentas()) {
+            for (Cuenta cuenta : usuario.obtenerCuentas()) {
                 sb.append("  └ ").append(cuenta).append("\n");
             }
         }

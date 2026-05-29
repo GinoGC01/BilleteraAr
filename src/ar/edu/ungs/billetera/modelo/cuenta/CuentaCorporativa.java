@@ -13,11 +13,11 @@ public class CuentaCorporativa extends Cuenta {
 
     @Override
     public boolean puedeOperar(double monto) {
-        return usuarioAutorizado && (getSaldo() - monto) >= 0;
+        return usuarioAutorizado && (obtenerSaldo() - monto) >= 0;
     }
 
-    public String getCuit() { return cuit; }
-    public String getTipo() {
+    public String obtenerCuit() { return cuit; }
+    public String obtenerTipo() {
         return "Corporativa";
     }
     public boolean isUsuarioAutorizado() { return usuarioAutorizado; }

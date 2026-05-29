@@ -15,23 +15,23 @@ public class Transferencia extends Actividad {
     }
 
     public void ejecutar() {
-        if (!getCuentaOrigen().puedeOperar(monto)) {
+        if (!obtenerCuentaOrigen().puedeOperar(monto)) {
             throw new IllegalStateException("Saldo insuficiente en cuenta origen.");
         }
-        if (!getCuentaDestino().puedeOperar(monto)) {
+        if (!obtenerCuentaDestino().puedeOperar(monto)) {
             throw new IllegalStateException("La cuenta destino superaría el límite permitido.");
         }
-        getCuentaOrigen().debitar(monto);
+        obtenerCuentaOrigen().debitar(monto);
         cuentaDestino.acreditar(monto);
     }
 
-    public double getMonto() { return monto; }
-    public Cuenta getCuentaDestino() { return cuentaDestino; }
+    public double obtenerMonto() { return monto; }
+    public Cuenta obtenerCuentaDestino() { return cuentaDestino; }
 
     @Override
     public String toString() {
         return "Transferencia | " + super.toString() +
-                " | Destino: " + cuentaDestino.getCvu() +
+                " | Destino: " + cuentaDestino.obtenerCvu() +
                 " | Monto: $" + monto;
     }
 }

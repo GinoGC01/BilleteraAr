@@ -30,12 +30,12 @@ public class Usuario {
         this.totalInvertido += monto;
     }
 
-    public String getId() { return dni; }
-    public String getNombre() { return nombre; }
-    public String getEmail() { return email; }
-    public String getTelefono() { return telefono; }
-    public List<Cuenta> getCuentas() { return cuentas; }
-    public double getTotalInvertido() { return totalInvertido; }
+    public String obtenerId() { return dni; }
+    public String obtenerNombre() { return nombre; }
+    public String obtenerEmail() { return email; }
+    public String obtenerTelefono() { return telefono; }
+    public List<Cuenta> obtenerCuentas() { return cuentas; }
+    public double obtenerTotalInvertido() { return totalInvertido; }
 
     @Override
     public String toString() {

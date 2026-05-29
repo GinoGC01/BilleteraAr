@@ -21,9 +21,9 @@ public class FondoLiquidez extends Inversion {
 
     @Override
     public double calcularResultado() {
-        long diasTranscurridos = Utilitarios.hoy().toEpochDay() - getFechaConstitucion().toEpochDay();
+        long diasTranscurridos = Utilitarios.hoy().toEpochDay() - obtenerFechaConstitucion().toEpochDay();
         double cotizacionFle = Utilitarios.consultarCotizacion("FLE");
-        return getMonto() * (0.08 / 365.0) * diasTranscurridos * cotizacionFle;
+        return obtenerMonto() * (0.08 / 365.0) * diasTranscurridos * cotizacionFle;
     }
 
     @Override

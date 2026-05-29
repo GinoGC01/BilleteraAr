@@ -15,16 +15,16 @@ public class RentaFija extends Inversion implements Precancelable {
 
     @Override
     public double calcularResultado() {
-        long diasTranscurridos = Utilitarios.hoy().toEpochDay() - getFechaConstitucion().toEpochDay();
-        return getMonto() * (tasaInteres / 365.0) * diasTranscurridos;
+        long diasTranscurridos = Utilitarios.hoy().toEpochDay() - obtenerFechaConstitucion().toEpochDay();
+        return obtenerMonto() * (tasaInteres / 365.0) * diasTranscurridos;
     }
 
     @Override
     public double calcularResultadoPrecancelado() {
-        return getMonto() + (calcularResultado() / 2);
+        return obtenerMonto() + (calcularResultado() / 2);
     }
 
-    public double getTasaInteres() { return tasaInteres; }
+    public double obtenerTasaInteres() { return tasaInteres; }
 
     @Override
     public String toString() {

@@ -19,22 +19,22 @@ public class VinculadaDivisa extends Inversion implements Precancelable {
 
     @Override
     public double calcularResultado() {
-        long diasTranscurridos = Utilitarios.hoy().toEpochDay() - getFechaConstitucion().toEpochDay();
-        double montoEnDivisas = getMonto() / cotizacionInicial;
+        long diasTranscurridos = Utilitarios.hoy().toEpochDay() - obtenerFechaConstitucion().toEpochDay();
+        double montoEnDivisas = obtenerMonto() / cotizacionInicial;
         double interesesEnDivisas = montoEnDivisas * (tasaInteres / 365.0) * diasTranscurridos;
         return (montoEnDivisas + interesesEnDivisas) * Utilitarios.consultarCotizacion(divisa);
     }
 
     @Override
     public double calcularResultadoPrecancelado() {
-        long diasTranscurridos = Utilitarios.hoy().toEpochDay() - getFechaConstitucion().toEpochDay();
-        double montoEnDivisas = getMonto() / cotizacionInicial;
+        long diasTranscurridos = Utilitarios.hoy().toEpochDay() - obtenerFechaConstitucion().toEpochDay();
+        double montoEnDivisas = obtenerMonto() / cotizacionInicial;
         double interesesEnDivisas = montoEnDivisas * (tasaInteres / 365.0) * diasTranscurridos / 2;
         return (montoEnDivisas + interesesEnDivisas) * Utilitarios.consultarCotizacion(divisa);
     }
 
-    public String getDivisa() { return divisa; }
-    public double getTasaInteres() { return tasaInteres; }
+    public String obtenerDivisa() { return divisa; }
+    public double obtenerTasaInteres() { return tasaInteres; }
 
     @Override
     public String toString() {

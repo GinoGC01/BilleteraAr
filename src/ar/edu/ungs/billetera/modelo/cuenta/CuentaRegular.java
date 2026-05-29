@@ -13,10 +13,10 @@ public class CuentaRegular extends Cuenta {
 
     @Override
     public boolean puedeOperar(double monto) {
-        return (getSaldo() + monto) <= SALDO_MAXIMO;
+        return (obtenerSaldo() + monto) <= SALDO_MAXIMO;
     }
 
-    public String getTipo() {
+    public String obtenerTipo() {
         return "Regular";
     }
 
